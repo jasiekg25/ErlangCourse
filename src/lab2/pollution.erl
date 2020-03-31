@@ -113,13 +113,18 @@ getStationMeanByStationName(Monitor, StationName, Type) ->
 
 getStationMeanByStation(Monitor, Station, Type) ->
   MeasurementsMap = Station#station.measurements,
-  FindMeasurementsWithType = fun({_, Type1}) -> Type1 == Type end,
+  FindMeasurementsWithType = fun({_, Type1}, _) -> Type1 == Type end,
   MeasurementsWithType = maps:values(maps:filter(FindMeasurementsWithType, MeasurementsMap)),
-  MeanValue = lists:foldl(fun(A, B) -> A + B end, 0, MeasurementsWithType) / length(MeasurementsWithType),
+  TotalValue = lists:foldl(fun(A, B) -> A + B end, 0, MeasurementsWithType),
+  TotalNumber = length(MeasurementsWithType),
+  case TotalNumber == 0 of
+    true -> MeanValue = 0;
+    false -> MeanValue = TotalValue / TotalNumber
+  end,
   {Monitor, Station, MeanValue}.
 
 
-getDailyMean(Monitor, Type, Date) ->
+getDailyMean(Monitor, Type, {Date, _}) ->
   FindCorrectMeasurements = fun({{Date1, _}, Type1}, _) -> ((Date1 == Date) and (Type1 == Type)) end,
   Stations = Monitor#monitor.stations,
 
@@ -135,7 +140,10 @@ getDailyMean(Monitor, Type, Date) ->
 
   ValueTotal = lists:foldl(fun(A, B) -> A + B end, 0, MappedValues),
   NumberTotal = lists:foldl(fun(A, B) -> A + B end, 0, MappedNumbers),
-  ValueTotal.
+  case NumberTotal == 0 of
+    true -> 0;
+    false -> ValueTotal / NumberTotal
+  end.
 
 
 getStationWithHighestMeanMeasurements(Monitor, Type) ->

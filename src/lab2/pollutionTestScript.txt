@@ -1,0 +1,21 @@
+M0 = pollution:createMonitor(),
+M1 = pollution:addStation(M0, 'S1', {1, 1}),
+M2 = pollution:addStation(M1, 'S2', {2, 2}),
+M3 = pollution:addStation(M2, 'S3', {3, 3}),
+
+D0 = {{2020,3,31},{15,47,00}},
+D1 = {{2020,3,30},{15,47,00}},
+D2 = {{2020,3,31},{14,47,00}},
+
+M4 = pollution:addMeasurement(M3, 'S1', 'PM10', D0, 15),
+M5 = pollution:addMeasurement(M4, 'S1', 'PM10', D1, 25),
+M6 = pollution:addMeasurement(M5, 'S1', 'PM10', D2, 125),
+M7 = pollution:addMeasurement(M6, 'S1', 'PM25', D0, 15),
+M8 = pollution:addMeasurement(M7, 'S1', 'PM25', D1, 255),
+
+M9 = pollution:removeMeasurement(M8, 'S1', 'PM25', D1),
+
+V0 = pollution:getValueOfMeasurement(M9, 'S1', 'PM10', D0),
+V1 = pollution:getDailyMean(M9, 'PM10', D2),
+StationsList1 = pollution:getStationWithHighestMeanMeasurements(M9, 'PM10')
+
