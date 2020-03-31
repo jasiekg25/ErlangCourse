@@ -17,5 +17,8 @@ M9 = pollution:removeMeasurement(M8, 'S1', 'PM25', D1),
 
 V0 = pollution:getValueOfMeasurement(M9, 'S1', 'PM10', D0),
 V1 = pollution:getDailyMean(M9, 'PM10', D2),
-StationsList1 = pollution:getStationWithHighestMeanMeasurements(M9, 'PM10')
+StationsList0 = pollution:getStationWithHighestMeanMeasurements(M9, 'PM10'),
+StationsList1 = pollution:getStationsWithMeanMeasurementsOverLimit(M9, 'PM10', 0),
+StationsList2 = pollution:getStationsWithMeanMeasurementsOverLimit(M9, 'PM10', 150).
+
 
