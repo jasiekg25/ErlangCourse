@@ -48,16 +48,16 @@ findStationByName(StationName, [#station{location = {X, Y}, name = StationName, 
 findStationByName(StationName, [_ | Stations]) ->
   findStationByName(StationName, Stations);
 findStationByName(_, []) ->
-  {err, notFound}.
+  {error, notFound}.
 
 
 addMeasurement(Monitor, StationName, Type, Date, Value) -> %% addValue
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {err, notFound} ->
-      {err, nonExistentStation};
-    {err, _} ->
-      {err, sthWrongHappened};
+    {error, notFound} ->
+      {error, nonExistentStation};
+    {error, _} ->
+      {error, sthWrongHappened};
     {found, FoundStation} ->
       MeasurementsMap = FoundStation#station.measurements,
       NewMeasurementsMap = MeasurementsMap#{{Date, Type} => Value},
@@ -71,10 +71,10 @@ addMeasurement(Monitor, StationName, Type, Date, Value) -> %% addValue
 removeMeasurement(Monitor, StationName, Type, Date) ->
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {err, notFound} ->
-      {err, nonExistentStation};
-    {err, _} ->
-      {err, sthWrongHappened};
+    {error, notFound} ->
+      {error, nonExistentStation};
+    {error, _} ->
+      {error, sthWrongHappened};
     {found, FoundStation} ->
       MeasurementsMap = FoundStation#station.measurements,
       NotEqualMap = fun(Key, _) -> not (Key == {Date, Type}) end,
@@ -89,10 +89,10 @@ removeMeasurement(Monitor, StationName, Type, Date) ->
 getValueOfMeasurement(Monitor, StationName, Type, Date) ->
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {err, notFound} ->
-      {err, nonExistentStation};
-    {err, _} ->
-      {err, sthWrongHappened};
+    {error, notFound} ->
+      {error, nonExistentStation};
+    {error, _} ->
+      {error, sthWrongHappened};
     {found, FoundStation} ->
       MeasurementsMap = FoundStation#station.measurements,
       maps:get({Date, Type}, MeasurementsMap)
@@ -102,10 +102,10 @@ getValueOfMeasurement(Monitor, StationName, Type, Date) ->
 getStationMeanByStationName(Monitor, StationName, Type) ->
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {err, notFound} ->
-      {err, nonExistentStation};
-    {err, _} ->
-      {err, unknownError};
+    {error, notFound} ->
+      {error, nonExistentStation};
+    {error, _} ->
+      {error, unknownError};
     {found, FoundStation} ->
       getStationMeanByStation(Monitor, FoundStation, Type)
   end.

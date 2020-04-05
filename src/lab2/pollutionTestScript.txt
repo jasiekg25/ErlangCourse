@@ -1,3 +1,21 @@
+/*
+Pierwsza część testu buduje bazę składającą się z 3 stacji (pomiary dodawane tylko dla jednej).
+Następnie wydobywam z bazy interesujące mnie dane, które powinny wynosić odpowiednio:
+
+V0 = 15 // wartość pomiaru z D0 (data i czasu) o typie 'PM10' ze stacji 'S1'
+V1 = 70.0 // Średnia wartość pomiaru typu 'PM10' z D2(tylko data więc również pomiary dodane z datą D0) -> (15 + 125) / 2
+
+Przy następnych funkcjach przyjąłem regułe, że zwracana jest lista w postaci [ {Monitor, Station, Value} | _ ],
+	gdzie Monitor jest wypisaniem zawartości całego monitora(wszystkich zawieranych przez niego stacji), Station to analogiczna czynność dla konkretnej stacji,
+	a Value to wartość zależna od funkcji (średnia dzienna dla danego typu, średnia całej stacji dla danego typu itd )
+Dla uproszczenia zapisu wypiszę tylko wyniki ukryte tylko pod Value, a resztę zostawię w postaci Monitor, Station
+StationList0 = [{Monitor9, Station1, 55.0 }]  // (15 + 25 + 125) / 3
+StationList1 = [ {Monitor9, Station1, 55.0}]
+StationList2 = [] // Żadna średnia nie przekracza limitu
+
+Napisany przeze mnie skrypt wykorzystuje wszystkie funkcje w module (w tym wszystkie poboczne)
+*/
+
 M0 = pollution:createMonitor(),
 M1 = pollution:addStation(M0, 'S1', {1, 1}),
 M2 = pollution:addStation(M1, 'S2', {2, 2}),
