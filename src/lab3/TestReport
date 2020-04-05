@@ -1,0 +1,84 @@
+Sprzęt:
+	System Operacyjny: Ubuntu
+	Rdzenie: 8
+
+
+TESTS
+
+Sequence I:
+1> parallelCalculations:test(1000, 1000).
+Test made for:
+   ClientsNumber: 1000
+   LockersNumber: 1000
+Full Parallel version took: 1 seconds
+Semi-Parallel version took: 0 seconds
+Sequential version took 0 seconds
+ok
+
+2> parallelCalculations:test(1000, 10000).
+Test made for:
+   ClientsNumber: 1000
+   LockersNumber: 10000
+Full Parallel version took: 1 seconds
+Semi-Parallel version took: 1 seconds
+Sequential version took 2 seconds
+ok
+
+3> parallelCalculations:test(1000, 100000).
+Test made for:
+   ClientsNumber: 1000
+   LockersNumber: 100000
+Full Parallel version took: 12 seconds
+Semi-Parallel version took: 12 seconds
+Sequential version took 27 seconds
+ok
+
+4> parallelCalculations:test(1000, 1000000).
+Test made for:
+   ClientsNumber: 1000
+   LockersNumber: 1000000
+Po 15 minutach zastopowany
+
+
+Sequence II:
+1> parallelCalculations:test(1000, 1000).
+Test made for:
+   ClientsNumber: 1000
+   LockersNumber: 1000
+Full Parallel version took: 1 seconds
+Semi-Parallel version took: 0 seconds
+Sequential version took 0 seconds
+ok
+
+2> parallelCalculations:test(10000, 1000).
+Test made for:
+   ClientsNumber: 10000
+   LockersNumber: 1000
+Full Parallel version took: 1 seconds
+Semi-Parallel version took: 1 seconds
+Sequential version took 2 seconds
+ok
+
+3> parallelCalculations:test(100000, 1000).
+Test made for:
+   ClientsNumber: 100000
+   LockersNumber: 1000
+Full Parallel version took: 7 seconds
+Semi-Parallel version took: 6 seconds
+Sequential version took 21 seconds
+ok
+
+4> parallelCalculations:test(100000, 10000).
+Test made for:
+   ClientsNumber: 100000
+   LockersNumber: 10000
+Full Parallel version took: 100 seconds
+Semi-Parallel version took: 84 seconds
+Sequential version took 232 seconds
+ok
+
+5> parallelCalculations:test(100000, 100000).
+Test made for:
+   ClientsNumber: 100000
+   LockersNumber: 100000
+Po 15min zastopowany
