@@ -1,6 +1,6 @@
-Sprzęt:
-	System Operacyjny: Ubuntu
-	Rdzenie: 8
+Device Specyfication:
+	Operating System: Ubuntu
+	Number of Cores: 8
 
 
 TESTS
@@ -37,7 +37,8 @@ ok
 Test made for:
    ClientsNumber: 1000
    LockersNumber: 1000000
-Po 15 minutach zastopowany
+Stopped after 15 minutes
+
 
 
 Sequence II:
@@ -81,4 +82,4 @@ ok
 Test made for:
    ClientsNumber: 100000
    LockersNumber: 100000
-Po 15min zastopowany
+Stopped after 15 minutes

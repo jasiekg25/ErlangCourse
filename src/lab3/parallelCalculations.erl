@@ -64,7 +64,7 @@ sequentialVersion(ClientsList, LockersList) ->
   {_, SecStart, _} = now(),
   ResultList = [ findMyParcelLocker(Client, LockersList) || Client <- ClientsList],
   {_, SecEnd, _} = now(),
-  io:format("Sequential version took ~p seconds ~n", [SecEnd - SecStart]).
+  io:format("Sequential version took: ~p seconds ~n", [SecEnd - SecStart]).
 %%  ResultList.
 
 

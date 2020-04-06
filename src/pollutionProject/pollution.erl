@@ -18,24 +18,24 @@
 %%-record(measurement, {date_time, type, value}).
 -record(monitor, {stations}).  %% Stations as List
 
-%% createMonitor() -> monitor`
-%% addStation(StationName, {X, Y}, OldMonitor) -> monitor
-%% addValue(StationName, Date, Type, Value) -> monitor
-%% removeValue(StationName, Date, Type) -> monitor
-%% getOneValue(StationName, Date, Type) -> value
-%% getStationMean(StationName, Type) -> MeanValue
-%% getDailyMean(Date, Type) -> MeanValue
+%% createMonitor() -> Monitor
+%% addStation(OldMonitor, StationName, StationLocation) -> -> Monitor
+%% addMeasurement(Monitor, StationName, Type, Date, Value) -> Monitor
+%% removeMeasurement(Monitor, StationName, Type, Date) -> Monitor
+%% getValueOfMeasurement(Monitor, StationName, Type, Date) -> Value ?
+%% getStationMeanByStationName(Monitor, StationName, Type) ->   {Monitor, Station, MeanValue}
+%% getDailyMean(Monitor, Type, {Date, _}) -> MeanValue
 %%
-%%getWorstStation(Type, date) -> StationName
-%%getOverLimitStations(Type, Date) -> monitor
+%%getStationWithHighestMeanMeasurements(Monitor, Type) -> [ {Monitor, Station, HighestValue} | Tail ]
+%%getStationsWithMeanMeasurementsOverLimit(Monitor, Type, Limit) -> [ {Monitor, Station, ValueOverLimit} | Tail ]
 
 createMonitor() ->
   Monitor = #monitor{stations = []},
   Monitor.
 
-addStation(OldMonitor, StationName, {X, Y}) ->
+addStation(OldMonitor, StationName, StationLocation) ->
   Stations = OldMonitor#monitor.stations,
-  NewStation = #station{name = StationName, location = {X, Y}, measurements = #{}},
+  NewStation = #station{name = StationName, location = StationLocation, measurements = #{}},
   NewMonitor = #monitor{stations = [NewStation | Stations]},
   NewMonitor.
 
@@ -48,16 +48,14 @@ findStationByName(StationName, [#station{location = {X, Y}, name = StationName, 
 findStationByName(StationName, [_ | Stations]) ->
   findStationByName(StationName, Stations);
 findStationByName(_, []) ->
-  {error, notFound}.
+  {error, notFoundStationWithThatName}.
 
 
 addMeasurement(Monitor, StationName, Type, Date, Value) -> %% addValue
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {error, notFound} ->
-      {error, nonExistentStation};
-    {error, _} ->
-      {error, sthWrongHappened};
+    {error, Msg} ->
+      {error, Msg};
     {found, FoundStation} ->
       MeasurementsMap = FoundStation#station.measurements,
       NewMeasurementsMap = MeasurementsMap#{{Date, Type} => Value},
@@ -71,10 +69,8 @@ addMeasurement(Monitor, StationName, Type, Date, Value) -> %% addValue
 removeMeasurement(Monitor, StationName, Type, Date) ->
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {error, notFound} ->
-      {error, nonExistentStation};
-    {error, _} ->
-      {error, sthWrongHappened};
+    {error, Msg} ->
+      {error, Msg};
     {found, FoundStation} ->
       MeasurementsMap = FoundStation#station.measurements,
       NotEqualMap = fun(Key, _) -> not (Key == {Date, Type}) end,
@@ -89,10 +85,8 @@ removeMeasurement(Monitor, StationName, Type, Date) ->
 getValueOfMeasurement(Monitor, StationName, Type, Date) ->
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {error, notFound} ->
-      {error, nonExistentStation};
-    {error, _} ->
-      {error, sthWrongHappened};
+    {error, Msg} ->
+      {error, Msg};
     {found, FoundStation} ->
       MeasurementsMap = FoundStation#station.measurements,
       maps:get({Date, Type}, MeasurementsMap)
@@ -102,10 +96,8 @@ getValueOfMeasurement(Monitor, StationName, Type, Date) ->
 getStationMeanByStationName(Monitor, StationName, Type) ->
   Station = getStationByStationName(Monitor, StationName),
   case Station of
-    {error, notFound} ->
-      {error, nonExistentStation};
-    {error, _} ->
-      {error, unknownError};
+    {error, Msg} ->
+      {error, Msg};
     {found, FoundStation} ->
       getStationMeanByStation(Monitor, FoundStation, Type)
   end.
