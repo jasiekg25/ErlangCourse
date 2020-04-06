@@ -11,16 +11,20 @@
 
 %% API
 %%-export([]).
--export([start/0, stop/0, getMonitor/0, addStation/2, addMeasurement/4, removeMeasurement/3, getStationsWithMeanMeasurementsOverLimit/2, getStationWithHighestMeanMeasurements/1, getDailyMean/2, getStationMeanByStationName/2, getValueOfMeasurement/3]).
+-export([start/1, start/0, stop/0, getMonitor/0, addStation/2, addMeasurement/4, removeMeasurement/3, getStationsWithMeanMeasurementsOverLimit/2, getStationsWithHighestMeanMeasurements/1, getDailyMean/2, getStationMeanByStationName/2, getValueOfMeasurement/3]).
 
 start() ->
   register(pollutionServer, spawn(fun() -> init() end)).
+start(Monitor) ->
+  register(pollutionServer, spawn(fun () -> init(Monitor) end)).
 
 stop() ->
   pollutionServer ! {request, self(), terminate}.
 
 init() ->
   Monitor = pollution:createMonitor(),
+  loop(Monitor).
+init(Monitor) ->
   loop(Monitor).
 
 loop(Monitor) ->
@@ -61,13 +65,13 @@ loop(Monitor) ->
       DailyMeanValue = pollution:getDailyMean(Monitor, lists:nth(1, Args), lists:nth(2, Args)),
       Pid ! {reply, DailyMeanValue},
       loop(Monitor);
-    {request, Pid, getStationWithHighestMeanMeasurements, Args} ->
-      List = pollution:getStationsWithHighestMeanMeasurements(Monitor, lists:nth(1, Args)),
-      Pid ! {reply, List},
+    {request, Pid, getStationsWithHighestMeanMeasurements, Args} ->
+      Value = pollution:getStationsWithHighestMeanMeasurements(Monitor, lists:nth(1, Args)),
+      Pid ! {reply, Value},
       loop(Monitor);
     {request, Pid, getStationsWithMeanMeasurementsOverLimit, Args} ->
-      List = pollution:getStationsWithMeanMeasurementsOverLimit(Monitor, lists:nth(1, Args), lists:nth(2, Args)),
-      Pid ! {reply, List},
+      Value = pollution:getStationsWithMeanMeasurementsOverLimit(Monitor, lists:nth(1, Args), lists:nth(2, Args)),
+      Pid ! {reply, Value},
       loop(Monitor);
     {request, Pid, getMonitor, _} ->
       Pid ! {reply, Monitor},
@@ -83,7 +87,7 @@ call(Message, Args) ->
   pollutionServer ! {request, self(), Message, Args},
   receive
     {reply, Reply} ->
-      io:format("~p : ~p~n", [Message, Reply]),
+%%      io:format("~p : ~p~n", [Message, Reply]),
       Reply
   end.
 
@@ -108,8 +112,8 @@ getStationMeanByStationName(StationName, Type) ->
 getDailyMean(Type, Date) ->
   call(getDailyMean, [Type, Date]).
 
-getStationWithHighestMeanMeasurements(Type) ->
-  call(getStationWithHighestMeanMeasurements, [Type]).
+getStationsWithHighestMeanMeasurements(Type) ->
+  call(getStationsWithHighestMeanMeasurements, [Type]).
 
 getStationsWithMeanMeasurementsOverLimit(Type, Limit) ->
   call(getStationsWithMeanMeasurementsOverLimit, [Type, Limit]).
