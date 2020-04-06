@@ -4,10 +4,10 @@
 %%% @doc
 %%%
 %%% @end
-%%% Created : 06. Apr 2020 02:45
+%%% Created : 06. Apr 2020 14:24
 %%%-------------------------------------------------------------------
--module(test_pollution).
 -author("jasiek").
 
-%% API
--export([]).
+-record(station, {name, location, measurements}). %% measurements as Map (Data_time, Type) => Value
+%%-record(measurement, {date_time, type, value}).
+-record(monitor, {stations}).  %% Stations as List

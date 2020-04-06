@@ -8,15 +8,12 @@
 %%%-------------------------------------------------------------------
 -module(pollution).
 -author("jasiek").
-
+-include("pollutionRecords.hrl").
 %% API
 -compile(export_all).
 %%-export([createMonitor/0, addStation/3, addMeasurement/5, removeMeasurement/4, getValueOfMeasurement/4]).
 
 
--record(station, {name, location, measurements}). %% measurements as Map (Data_time, Type) => Value
-%%-record(measurement, {date_time, type, value}).
--record(monitor, {stations}).  %% Stations as List
 
 %% createMonitor() -> Monitor
 %% addStation(OldMonitor, StationName, StationLocation) -> -> Monitor
@@ -35,9 +32,18 @@ createMonitor() ->
 
 addStation(OldMonitor, StationName, StationLocation) ->
   Stations = OldMonitor#monitor.stations,
-  NewStation = #station{name = StationName, location = StationLocation, measurements = #{}},
-  NewMonitor = #monitor{stations = [NewStation | Stations]},
-  NewMonitor.
+  FindSame =
+    fun (#station{name=Name, location=Location}) ->
+      (Name == StationName) or (Location == StationLocation) end,
+  case lists:any(FindSame, Stations) of
+    true ->
+      OldMonitor;
+    false ->
+      NewStation = #station{name = StationName, location = StationLocation, measurements = #{}},
+      NewMonitor = #monitor{stations = [NewStation | Stations]},
+      NewMonitor
+  end.
+
 
 getStationByStationName(Monitor, StationName) ->
   Stations = Monitor#monitor.stations,
@@ -110,7 +116,7 @@ getStationMeanByStation(Monitor, Station, Type) ->
   TotalValue = lists:foldl(fun(A, B) -> A + B end, 0, MeasurementsWithType),
   TotalNumber = length(MeasurementsWithType),
   case TotalNumber == 0 of
-    true -> MeanValue = 0;
+    true -> MeanValue = {error, noSuchTypeOfMeasurement};
     false -> MeanValue = TotalValue / TotalNumber
   end,
   {Monitor, Station, MeanValue}.
@@ -133,12 +139,12 @@ getDailyMean(Monitor, Type, {Date, _}) ->
   ValueTotal = lists:foldl(fun(A, B) -> A + B end, 0, MappedValues),
   NumberTotal = lists:foldl(fun(A, B) -> A + B end, 0, MappedNumbers),
   case NumberTotal == 0 of
-    true -> 0;
+    true -> {error, noThisTypeOfMeasurementInThisDay};
     false -> ValueTotal / NumberTotal
   end.
 
 
-getStationWithHighestMeanMeasurements(Monitor, Type) ->
+getStationsWithHighestMeanMeasurements(Monitor, Type) ->
   Stations = Monitor#monitor.stations,
   Fun = fun(Station) -> getStationMeanByStation(Monitor, Station, Type)  end,
   StationsMeanList = lists:map(Fun, Stations),
@@ -148,6 +154,8 @@ getStationWithHighestMeanMeasurements(Monitor, Type) ->
 
 findHighest([{M1, S1, Value} | Tail]) ->
   findHighest([{M1, S1, Value} | Tail], []).
+findHighest([ {_, _, {error, noSuchTypeOfMeasurement}} | Tail], List) ->
+  findHighest(Tail, List);
 findHighest([], HighestList) ->
   HighestList;
 findHighest([{M1, S1, Value} | Tail], []) ->
@@ -170,6 +178,8 @@ getStationsWithMeanMeasurementsOverLimit(Monitor, Type, Limit) ->
 
 findHigher(List, Limit) ->
   findHigher(List, Limit, []).
+findHigher([ {_, _, {error, noSuchTypeOfMeasurement}} | Tail], Limit, List) ->
+  findHigher(Tail,Limit, List);
 findHigher([], _, ResultList) ->
   ResultList;
 findHigher([{M1, S1, V1} | Tail], Limit, []) when V1 > Limit ->

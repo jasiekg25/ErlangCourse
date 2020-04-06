@@ -62,7 +62,7 @@ loop(Monitor) ->
       Pid ! {reply, DailyMeanValue},
       loop(Monitor);
     {request, Pid, getStationWithHighestMeanMeasurements, Args} ->
-      List = pollution:getStationWithHighestMeanMeasurements(Monitor, lists:nth(1, Args)),
+      List = pollution:getStationsWithHighestMeanMeasurements(Monitor, lists:nth(1, Args)),
       Pid ! {reply, List},
       loop(Monitor);
     {request, Pid, getStationsWithMeanMeasurementsOverLimit, Args} ->
